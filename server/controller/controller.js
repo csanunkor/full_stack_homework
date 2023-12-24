@@ -98,7 +98,6 @@ exports.getFileTree = async (req, res, next) => {
       } else {
         let fileTree = buildFileTree(results);
         res.status(200).json({ success: true, data: fileTree });
-        console.log("File Tree Generated Successfully");
       }
     });
   } catch (error) {
@@ -120,7 +119,6 @@ exports.readFile = async (req, res, next) => {
       data = data.split("\n"); // split the document into lines
       data.length = 500; // set the total number of lines
       res.status(200).json({ success: true, data: data });
-      console.log("File Read Successfully");
     }
   });
 };
