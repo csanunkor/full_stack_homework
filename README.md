@@ -31,6 +31,13 @@ Our users are our Machina teammates who are doing the R&D for customers. We stor
 ### Running the Application
 
 In a Non Windows Subsystem for Linux (WSL) environment, you can start the application by running the following comand. The first time it runs, it will run `init.sql` to create tables and populate them with some seed data.
+
+First time running the application use the command:
+```
+docker-compose up --build
+```
+
+If you've ran the app before use the following comand:
 ```
 docker compose up
 ```
