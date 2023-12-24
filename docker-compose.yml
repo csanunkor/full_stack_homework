@@ -39,6 +39,22 @@ services:
       - db
     networks: 
      - internalnet
+  
+  reactapp:
+    container_name: machina_react_app
+    build: ./client
+    image: reactapp:1.0
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    stdin_open: true
+    tty: true
+    depends_on:
+      - nodeapp
+    networks: 
+     - internalnet 
+
 
 networks:
   internalnet:

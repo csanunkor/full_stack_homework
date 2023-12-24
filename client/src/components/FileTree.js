@@ -19,7 +19,7 @@ const FileModal = ({
 
   useEffect(() => {
     axios
-      .get(` http://192.168.0.86:4000/api/readfile?filePath=${data}`)
+      .get(`http://localhost:8000/api/readfile?filePath=${data}`)
       .then((response) => {
         non3DFile
           ? setFileContent(response.data.data)
@@ -196,7 +196,7 @@ function FileTree() {
 
   useEffect(() => {
     axios
-      .get(" http://192.168.0.86:4000/api/filetree")
+      .get("http://localhost:8000/api/filetree")
       .then((response) => {
         setFileTreeData(response.data.data);
       })
