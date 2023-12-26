@@ -17,75 +17,43 @@ LEFT JOIN file ON process_run_file_artifact.file_artifact_uuid = file.uuid OR pa
 
 function buildFileTree(results) {
   let fileTree = [];
-  let customerA = {
-    customerName: results[0].customer,
-    parts: [
-      {
-        partName: results[0].part,
-        revisions: [
-          {
-            revisionName: results[0].revision,
-            data: [
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/revisions/d09f9cc9-30cc-480d-8d15-f1e5de5c5f1a/flange.stl",
-            ],
-          },
-          {
-            revisionName: results[3].revision,
-            data: [
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/revisions/cc50e60d-42c3-4a30-9c1b-8a8e0d2e0717/flange.step",
-            ],
-          },
-        ],
-        trials: [
-          {
-            trialName: results[0].trial,
-            data: [
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/0e7c36da-4125-4c13-8e5b-2e1a3d51c57e/form_path.csv",
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/0e7c36da-4125-4c13-8e5b-2e1a3d51c57e/form_build.csv",
-            ],
-          },
-          {
-            trialName: results[3].trial,
-            data: [
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/b58fb2c9-5a3d-44a0-89ef-ecb510883a1a/form_build.csv",
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/b58fb2c9-5a3d-44a0-89ef-ecb510883a1a/rsi1way_c1r1_state.log",
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/b58fb2c9-5a3d-44a0-89ef-ecb510883a1a/scanner_c1r1.log",
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/b58fb2c9-5a3d-44a0-89ef-ecb510883a1a/scan_mesh.ply",
-              "customers/d4b11d78-74e2-4efb-987c-38e2eb1a7a02/parts/4ca4f320-536c-4b2e-b63f-80c4a55b719d/trials/b58fb2c9-5a3d-44a0-89ef-ecb510883a1a/zmetric.json",
-            ],
-          },
-        ],
-      },
-    ],
-  };
 
-  let customerB = {
-    customerName: results[10].customer,
-    parts: [
-      {
-        partName: results[10].part,
-        revisions: [
-          {
-            revisionName: results[10].revision,
-            data: [
-              "customers/a0373fc3-f7f3-42ec-aa7d-222f16b35c882/parts/d45f5112-1c67-49ef-a61d-16b1f3d3be7c/revisions/d09f9cc9-30cc-480d-8d15-f1e5de5c5f1a/stiffener.stl",
-            ],
-          },
-        ],
-        trials: [
-          {
-            trialName: results[10].trial,
-            data: [
-              "customers/a0373fc3-f7f3-42ec-aa7d-222f16b35c882/parts/d45f5112-1c67-49ef-a61d-16b1f3d3be7c/trials/279b93c7-d0d9-48f7-8098-08712d7c775d/form_path.csv",
-              "customers/a0373fc3-f7f3-42ec-aa7d-222f16b35c882/parts/d45f5112-1c67-49ef-a61d-16b1f3d3be7c/trials/279b93c7-d0d9-48f7-8098-08712d7c775d/form_build.csv",
-            ],
-          },
-        ],
-      },
-    ],
-  };
+  for (const data of results) {
+    //Build customers array
+    let customer = fileTree.find((c) => c.customerName === data.customer);
+    if (customer === undefined) {
+      customer = { customerName: data.customer, parts: [] };
+      fileTree.push(customer);
+    }
 
-  fileTree.push(customerA, customerB);
+    // Build parts array
+    let part = customer.parts.find((p) => p.partName === data.part);
+    if (part === undefined) {
+      part = { partName: data.part, revisions: [], trials: [] };
+      customer.parts.push(part);
+    }
+
+    //build revisions array
+    let revision = part.revisions.find((r) => r.revisionName === data.revision);
+    if (revision === undefined) {
+      revision = { revisionName: data.revision, data: [] };
+      part.revisions.push(revision);
+    }
+
+    //build trials array
+    let trial = part.trials.find((t) => t.trialName === data.trial);
+    if (trial === undefined) {
+      trial = { trialName: data.trial, data: [] };
+      part.trials.push(trial);
+    }
+
+    //add files to revisions or trials
+    if (data.file_location.includes("trials"))
+      trial.data.push(data.file_location);
+    else if (data.file_location.includes("revisions"))
+      revision.data.push(data.file_location);
+  }
+
   return fileTree;
 }
 
